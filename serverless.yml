@@ -27,7 +27,7 @@ functions:
       - http:
           method: post
           path: notes
-          authorizer: authorizer
+          # authorizer: authorizer
 
   updateNote:
     handler: handler.updateNote

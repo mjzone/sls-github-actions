@@ -11,8 +11,8 @@ jobs:
     name: Production Deployment 
     if: github.event.ref == 'refs/heads/master'
     environment: 
-      name: Production
-      url: https://test.com
+      name: Dev
+      url: https://dev.test.com
     runs-on: ubuntu-latest
     strategy:
       matrix:
