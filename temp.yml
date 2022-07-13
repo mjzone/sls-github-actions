@@ -10,8 +10,9 @@ jobs:
   prodDeployment:
     name: Production Deployment 
     if: github.event.ref == 'refs/heads/master'
-    env: 
+    environment: 
       name: Production
+      url: https://test.com
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -28,8 +29,8 @@ jobs:
           args: -c "serverless plugin install --name serverless-iam-roles-per-function && serverless deploy -S prod"
           entrypoint: /bin/sh
         env:
-          AWS_ACCESS_KEY_ID: ${{ env.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ env.AWS_SECRET_ACCESS_KEY }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
             
   # DeployProd:
   #   name: Deploy to Production 
