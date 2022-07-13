@@ -1,0 +1,55 @@
+name: Deploying Notes API
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs: 
+  prodDeployment:
+    name: Production Deployment 
+    if: github.event.ref == 'refs/heads/master'
+    env: 
+      name: Production
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [14.x]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install Plugin and Deploy
+        uses: serverless/github-action@v2
+        with:
+          args: -c "serverless plugin install --name serverless-iam-roles-per-function && serverless deploy -S prod"
+          entrypoint: /bin/sh
+        env:
+          AWS_ACCESS_KEY_ID: ${{ env.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ env.AWS_SECRET_ACCESS_KEY }}
+            
+  # DeployProd:
+  #   name: Deploy to Production 
+  #   needs: [DeployStaging]
+  #   runs-on: ubuntu-latest
+  #   environment: 
+  #     name: Production
+  #     url: 'http://www.myapp.com'
+  #   steps:
+  #     - name: Deploy
+  #       run: echo I am deploying! 
+
+  # devDeployment:
+  #   name: Dev Deployment
+  #   if: github.event_name == 'pull_request'
+  #   needs: [Build]
+  #   runs-on: ubuntu-latest
+  #   env: 
+  #     name: Dev
+  #   steps:
+  #     - name: Deploy
+  #       run: echo I am deploying!  
+    
