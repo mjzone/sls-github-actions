@@ -11,8 +11,8 @@ jobs:
     name: Production Deployment 
     if: github.event.ref == 'refs/heads/master'
     environment: 
-      name: Dev
-      url: https://dev.test.com
+      name: Production
+      url: https://test.com
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -31,26 +31,28 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            
-  # DeployProd:
-  #   name: Deploy to Production 
-  #   needs: [DeployStaging]
-  #   runs-on: ubuntu-latest
-  #   environment: 
-  #     name: Production
-  #     url: 'http://www.myapp.com'
-  #   steps:
-  #     - name: Deploy
-  #       run: echo I am deploying! 
 
-  # devDeployment:
-  #   name: Dev Deployment
-  #   if: github.event_name == 'pull_request'
-  #   needs: [Build]
-  #   runs-on: ubuntu-latest
-  #   env: 
-  #     name: Dev
-  #   steps:
-  #     - name: Deploy
-  #       run: echo I am deploying!  
-    
+  devDeployment:
+    name: Dev Deployment 
+    if: github.event_name == 'pull_request'
+    environment: 
+      name: Dev
+      url: https://dev.test.com
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [14.x]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install Plugin and Deploy
+        uses: serverless/github-action@v2
+        with:
+          args: -c "serverless plugin install --name serverless-iam-roles-per-function && serverless deploy --stage dev"
+          entrypoint: /bin/sh
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
